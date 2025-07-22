@@ -1,7 +1,7 @@
 package shunnior.turnapp.app.infraestructure.out.persistance.user.mapper;
 
 import shunnior.turnapp.app.domain.user.UserH;
-import shunnior.turnapp.app.infraestructure.out.persistance.ServiceTask.ServiceTaskEntity;
+import shunnior.turnapp.app.infraestructure.out.persistance.ticket.TicketEntity;
 import shunnior.turnapp.app.infraestructure.out.persistance.user.UserEntity;
 
 import java.util.List;
@@ -27,10 +27,10 @@ public class UserMapper {
                 .password(entity.getPassword())
                 .roles(entity.getRoles()) // también es Set<Role>
                 .isBusy(entity.isBusy())
-                .assignedServiceIds(
-                        entity.getAssignedServices() != null
-                                ? entity.getAssignedServices().stream()
-                                .map(ServiceTaskEntity::getId)
+                .assignedTicketIds(
+                        entity.getAssignedTickets() != null
+                                ? entity.getAssignedTickets().stream()
+                                .map(TicketEntity::getId)
                                 .toList()
                                 : List.of()
                 )

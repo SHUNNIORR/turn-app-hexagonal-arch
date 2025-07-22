@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
                         req.requestMatchers("/auth/**", "/api/public/**").permitAll()
-                                .requestMatchers("/api/admin/service/close/**").hasRole("USER")
+                                .requestMatchers("/api/admin/ticket/close/**").hasRole("USER")
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/v1/users/dashboard").hasRole("USER")
                                 .requestMatchers("/api/v1/users/**").hasAnyRole("USER", "ADMIN")

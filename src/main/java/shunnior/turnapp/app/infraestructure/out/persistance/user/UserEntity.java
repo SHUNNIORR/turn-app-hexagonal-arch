@@ -5,7 +5,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import shunnior.turnapp.app.infraestructure.out.persistance.ServiceTask.ServiceTaskEntity;
+import shunnior.turnapp.app.infraestructure.out.persistance.ticket.TicketEntity;
 import shunnior.turnapp.app.infraestructure.out.persistance.user.roles.Role;
 import shunnior.turnapp.auth.repository.Token;
 
@@ -63,5 +63,5 @@ public class UserEntity implements UserDetails {
     private boolean isBusy = false;
 
     @OneToMany(mappedBy = "assignedTo", fetch = FetchType.EAGER)
-    private List<ServiceTaskEntity> assignedServices;
+    private List<TicketEntity> assignedTickets;
 }

@@ -17,5 +17,5 @@ public class UserH {
     private String password;
     private Set<Role> roles;
     private boolean isBusy;
-    private List<Integer> assignedServiceIds;
+    private List<Integer> assignedTicketIds;
 }
