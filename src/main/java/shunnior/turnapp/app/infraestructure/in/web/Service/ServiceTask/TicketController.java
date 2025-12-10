@@ -11,6 +11,8 @@ import shunnior.turnapp.app.domain.ticket.dto.TicketResponse;
 import shunnior.turnapp.app.domain.ticket.in.TicketUseCase;
 import shunnior.turnapp.app.infraestructure.out.persistance.user.UserEntity;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin/ticket")
 @RequiredArgsConstructor
@@ -51,5 +53,20 @@ public class TicketController {
                         userEntity.getEmail()
                 )
         );
+    }
+
+    @GetMapping("/unassigned")
+    public ResponseEntity<List<TicketResponse>> getUnassignedTickets(){
+        List<TicketResponse> unassignedTickets = ticketUseCase.getUnassignedTickets()
+                .stream()
+                .map(ticket -> new TicketResponse(
+                        ticket.getId(),
+                        ticket.getDescription(),
+                        "",
+                        ticket.getStatus()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(unassignedTickets);
     }
 }

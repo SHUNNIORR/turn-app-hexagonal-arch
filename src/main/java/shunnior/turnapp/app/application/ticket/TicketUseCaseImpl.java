@@ -102,4 +102,9 @@ public class TicketUseCaseImpl implements TicketUseCase {
 
         return "Servicio finalizado con éxito.";
     }
+
+    @Override
+    public List<Ticket> getUnassignedTickets() {
+        return serviceTaskRepository.findByAssignedToIsNull();
+    }
 }
