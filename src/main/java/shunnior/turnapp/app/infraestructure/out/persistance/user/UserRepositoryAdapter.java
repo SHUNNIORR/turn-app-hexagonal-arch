@@ -1,6 +1,8 @@
 package shunnior.turnapp.app.infraestructure.out.persistance.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import shunnior.turnapp.app.domain.user.UserH;
 import shunnior.turnapp.app.domain.user.out.UserRepositoryPort;
@@ -44,5 +46,21 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public Optional<UserH> findById(Integer userId) {
         return jpaRepository.findById(userId).map(UserMapper::toDomain);
+    }
+
+    @Override
+    public List<UserH> getAllUsersPaged(int page, int size) {
+        Page<UserEntity> paged = jpaRepository.findAllPaged(PageRequest.of(page, size));
+        return paged.getContent().stream()
+                .map(UserMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<UserH> findAvailableEmployeesPaged(int page, int size) {
+        Page<UserEntity> paged = jpaRepository.findAvailableEmployeesPaged(PageRequest.of(page, size));
+        return paged.getContent().stream()
+                .map(UserMapper::toDomain)
+                .toList();
     }
 }

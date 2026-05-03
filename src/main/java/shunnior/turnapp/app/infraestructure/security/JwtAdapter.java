@@ -1,9 +1,9 @@
-package shunnior.turnapp.auth.service;
+package shunnior.turnapp.app.infraestructure.security;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import shunnior.turnapp.app.domain.auth.in.JwtPort;
 import shunnior.turnapp.app.domain.user.UserH;
-import shunnior.turnapp.app.infraestructure.out.persistance.user.mapper.UserMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -11,8 +11,8 @@ import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
-@Service
-public class JwtService {
+@Component
+public class JwtAdapter implements JwtPort {
 
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
@@ -21,6 +21,7 @@ public class JwtService {
     @Value("${application.security.jwt.refresh-token.expiration}")
     private long refreshExpiration;
 
+    @Override
     public String extractUsername(String token) {
         return Jwts.parser()
                 .verifyWith(getSignInKey())
@@ -30,18 +31,20 @@ public class JwtService {
                 .getSubject();
     }
 
-    public String generateToken(final UserH user) {
+    @Override
+    public String generateToken(UserH user) {
+        return buildToken(user, jwtExpiration);
+    }
+
+    @Override
+    public String generateRefreshToken(UserH user) {
         return buildToken(user, refreshExpiration);
     }
 
-    public String generateRefreshToken(final UserH user) {
-        return buildToken(user, refreshExpiration);
-    }
-
-    private String buildToken(final UserH user, final long expiration) {
+    private String buildToken(UserH user, long expiration) {
         return Jwts
                 .builder()
-                .claim("role", UserMapper.toEntity(user).getRoles())
+                .claim("role", user.getRoles())
                 .claim("name", user.getName())
                 .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -50,6 +53,7 @@ public class JwtService {
                 .compact();
     }
 
+    @Override
     public boolean isTokenValid(String token, UserH user) {
         final String username = extractUsername(token);
         return (username.equals(user.getEmail())) && !isTokenExpired(token);

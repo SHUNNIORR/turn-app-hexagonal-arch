@@ -1,6 +1,5 @@
 package shunnior.turnapp.app.domain.user.in;
 
-
 import shunnior.turnapp.app.domain.user.UserH;
 
 import java.util.List;
@@ -16,4 +15,8 @@ public interface UserUseCase {
     UserH saveUser(UserH user);
 
     Optional<UserH> findById(Integer userId);
+
+    List<UserH> getAllUsersPaged(int page, int size);
+
+    List<UserH> findAvailableEmployeesPaged(int page, int size);
 }

@@ -2,6 +2,7 @@ package shunnior.turnapp.app.application.ticket;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import shunnior.turnapp.app.domain.exceptions.*;
 import shunnior.turnapp.app.domain.history.TicketHistory;
@@ -17,10 +18,10 @@ import shunnior.turnapp.app.domain.user.in.UserUseCase;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TicketUseCaseImpl implements TicketUseCase {
 
     private final TicketRepositoryPort serviceTaskRepository;
@@ -29,7 +30,6 @@ public class TicketUseCaseImpl implements TicketUseCase {
 
     @Override
     public Ticket createTicket(CreateTicketRequest serviceRequest, Integer createdBy) {
-
         boolean existsPending = serviceTaskRepository.existsByCreatedByAndStatus(
                 createdBy, TicketStatus.PENDING.name()
         );
@@ -52,12 +52,14 @@ public class TicketUseCaseImpl implements TicketUseCase {
     @Override
     @Transactional
     public AssignEmployeeResponse assignRandomEmployee(Integer ticketId) {
+        log.info("Assigning random employee to ticket: {}", ticketId);
         List<UserH> availableUsers = userUseCase.findAvailableEmployees();
         if (availableUsers.isEmpty()) {
+            log.warn("No available employees for ticket: {}", ticketId);
             throw new NoAvailableEmployeesException();
         }
 
-        UserH selectedUser = availableUsers.get(new Random().nextInt(availableUsers.size()));
+        UserH selectedUser = availableUsers.get((int) (Math.random() * availableUsers.size()));
         selectedUser.setBusy(true);
         userUseCase.saveUser(selectedUser);
 
@@ -65,12 +67,14 @@ public class TicketUseCaseImpl implements TicketUseCase {
                 .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
         task.setAssignedToUserId(selectedUser.getId());
+        task.setStatus(TicketStatus.ASSIGNED.name());
         serviceTaskRepository.save(task);
 
         ticketHistoryUseCase.registerHistory(new TicketHistory(
                 task.getId(), task, selectedUser, LocalDateTime.now()
         ));
 
+        log.info("Employee {} assigned to ticket {}", selectedUser.getEmail(), ticketId);
         return new AssignEmployeeResponse(
                 "Empleado asignado correctamente",
                 selectedUser.getEmail(),
@@ -81,6 +85,7 @@ public class TicketUseCaseImpl implements TicketUseCase {
     @Override
     @Transactional
     public String closeTicket(Integer ticketId, Integer loggedUserId, String loggedEmail) {
+        log.info("Closing ticket: {} by user: {}", ticketId, loggedEmail);
         Ticket task = serviceTaskRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
@@ -100,11 +105,18 @@ public class TicketUseCaseImpl implements TicketUseCase {
         assignedUser.setBusy(false);
         userUseCase.saveUser(assignedUser);
 
+        log.info("Ticket {} closed successfully", ticketId);
         return "Servicio finalizado con éxito.";
     }
 
     @Override
     public List<Ticket> getUnassignedTickets() {
         return serviceTaskRepository.findByAssignedToIsNull();
+    }
+
+    @Override
+    public List<Ticket> getUnassignedTicketsPaged(int page, int size) {
+        log.debug("Fetching unassigned tickets page={}, size={}", page, size);
+        return serviceTaskRepository.findByAssignedToIsNullPaged(page, size);
     }
 }

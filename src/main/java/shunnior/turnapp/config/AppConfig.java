@@ -11,8 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import shunnior.turnapp.app.domain.user.UserH;
 import shunnior.turnapp.app.domain.user.in.UserUseCase;
-import shunnior.turnapp.app.infraestructure.out.persistance.user.mapper.UserMapper;
 
 @Configuration
 @RequiredArgsConstructor
@@ -22,7 +22,11 @@ public class AppConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> UserMapper.toEntity(userUseCase.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found")));
+        return username -> {
+            UserH user = userUseCase.findByEmail(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            return new SecurityUserDetails(user);
+        };
     }
 
     @Bean
@@ -42,5 +46,4 @@ public class AppConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }

@@ -1,11 +1,10 @@
-package shunnior.turnapp.auth.repository;
+package shunnior.turnapp.app.infraestructure.out.persistence.token;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import shunnior.turnapp.app.domain.user.UserH;
 import shunnior.turnapp.app.infraestructure.out.persistance.user.UserEntity;
 
 @Data
@@ -13,7 +12,7 @@ import shunnior.turnapp.app.infraestructure.out.persistance.user.UserEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public final class Token {
+public class TokenEntity {
 
     @Id
     @GeneratedValue
@@ -39,5 +38,4 @@ public final class Token {
     public enum TokenType {
         BEARER
     }
-
 }

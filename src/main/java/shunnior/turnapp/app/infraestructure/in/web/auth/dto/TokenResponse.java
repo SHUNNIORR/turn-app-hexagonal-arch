@@ -1,4 +1,4 @@
-package shunnior.turnapp.auth.controller;
+package shunnior.turnapp.app.infraestructure.in.web.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,10 +7,8 @@ public record TokenResponse(
         String accessToken,
         @JsonProperty("refresh_token")
         String refreshToken,
-
         @JsonProperty("user_name")
         String username,
-
         @JsonProperty("email")
         String email
 ) {

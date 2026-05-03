@@ -11,4 +11,5 @@ public interface TicketUseCase {
     AssignEmployeeResponse assignRandomEmployee(Integer ticketId);
     String closeTicket(Integer ticketId, Integer loggedUserId, String loggedEmail);
     List<Ticket> getUnassignedTickets();
+    List<Ticket> getUnassignedTicketsPaged(int page, int size);
 }

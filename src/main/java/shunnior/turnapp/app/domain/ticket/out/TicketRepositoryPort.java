@@ -10,4 +10,5 @@ public interface TicketRepositoryPort {
     boolean existsByCreatedByAndStatus(Integer userId, String status);
     Optional<Ticket> findById(Integer id);
     List<Ticket> findByAssignedToIsNull();
+    List<Ticket> findByAssignedToIsNullPaged(int page, int size);
 }

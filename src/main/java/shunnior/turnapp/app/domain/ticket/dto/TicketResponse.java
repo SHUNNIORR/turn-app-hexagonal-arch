@@ -4,5 +4,6 @@ public record TicketResponse(
         Integer id,
         String description,
         String createdByEmail,
+        String assignedToEmail,
         String status
 ) {}

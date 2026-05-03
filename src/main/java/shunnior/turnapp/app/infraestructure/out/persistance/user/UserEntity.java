@@ -6,8 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import shunnior.turnapp.app.infraestructure.out.persistance.ticket.TicketEntity;
-import shunnior.turnapp.app.infraestructure.out.persistance.user.roles.Role;
-import shunnior.turnapp.auth.repository.Token;
+import shunnior.turnapp.app.infraestructure.out.persistence.token.TokenEntity;
+import shunnior.turnapp.app.domain.user.enums.Role;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -43,11 +43,10 @@ public class UserEntity implements UserDetails {
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
+    private List<TokenEntity> tokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        System.out.println("Roles asignados en getAuthorities()xxxx: " + roles);
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toList());

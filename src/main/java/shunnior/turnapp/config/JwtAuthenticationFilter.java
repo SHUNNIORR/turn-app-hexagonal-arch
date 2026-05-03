@@ -15,10 +15,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import shunnior.turnapp.app.domain.auth.in.JwtPort;
+import shunnior.turnapp.app.domain.auth.out.TokenRepositoryPort;
 import shunnior.turnapp.app.domain.user.UserH;
 import shunnior.turnapp.app.domain.user.in.UserUseCase;
-import shunnior.turnapp.auth.repository.TokenRepository;
-import shunnior.turnapp.auth.service.JwtService;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -27,9 +27,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtPort jwtPort;
     private final UserDetailsService userDetailsService;
-    private final TokenRepository tokenRepository;
+    private final TokenRepositoryPort tokenRepositoryPort;
     private final UserUseCase userUseCase;
 
     @Override
@@ -50,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
-        final String userEmail = jwtService.extractUsername(jwt);
+        final String userEmail = jwtPort.extractUsername(jwt);
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (userEmail == null || authentication != null) {
             filterChain.doFilter(request, response);
@@ -58,16 +58,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-        final boolean isTokenExpiredOrRevoked = tokenRepository.findByToken(jwt)
-                .map(token -> !token.getIsExpired() && !token.getIsRevoked())
-                .orElse(false);
-
+        final boolean isTokenExpiredOrRevoked = tokenRepositoryPort.isTokenValid(jwt);
 
         if (isTokenExpiredOrRevoked) {
             final Optional<UserH> user = userUseCase.findByEmail(userEmail);
 
             if (user.isPresent()) {
-                final boolean isTokenValid = jwtService.isTokenValid(jwt, user.get());
+                final boolean isTokenValid = jwtPort.isTokenValid(jwt, user.get());
 
                 if (isTokenValid) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

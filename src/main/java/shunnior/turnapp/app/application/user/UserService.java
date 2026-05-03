@@ -38,4 +38,14 @@ public class UserService implements UserUseCase {
     public Optional<UserH> findById(Integer userId) {
         return userRepositoryPort.findById(userId);
     }
+
+    @Override
+    public List<UserH> getAllUsersPaged(int page, int size) {
+        return userRepositoryPort.getAllUsersPaged(page, size);
+    }
+
+    @Override
+    public List<UserH> findAvailableEmployeesPaged(int page, int size) {
+        return userRepositoryPort.findAvailableEmployeesPaged(page, size);
+    }
 }

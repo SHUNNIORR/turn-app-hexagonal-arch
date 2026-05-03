@@ -11,4 +11,6 @@ public interface UserRepositoryPort {
     List<UserH> findAvailableEmployees();
     UserH saveUser(UserH user);
     Optional<UserH> findById(Integer userId);
+    List<UserH> getAllUsersPaged(int page, int size);
+    List<UserH> findAvailableEmployeesPaged(int page, int size);
 }

@@ -1,6 +1,8 @@
 package shunnior.turnapp.app.infraestructure.out.persistance.ticket;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import shunnior.turnapp.app.domain.ticket.Ticket;
 import shunnior.turnapp.app.domain.ticket.enums.TicketStatus;
@@ -17,6 +19,7 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
 
     private final TicketJpaRepository ticketJpaRepository;
     private final UserJpaRepository userJpaRepository;
+    
     @Override
     public Ticket save(Ticket ticket) {
         var createdBy = userJpaRepository.findById(ticket.getCreatedByUserId()).orElseThrow();
@@ -44,4 +47,9 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
         return ticketJpaRepository.findByAssignedToIsNull().stream().map(TicketMapper::toDomain).toList();
     }
 
+    @Override
+    public List<Ticket> findByAssignedToIsNullPaged(int page, int size) {
+        Page<TicketEntity> paged = ticketJpaRepository.findByAssignedToIsNullPaged(PageRequest.of(page, size));
+        return paged.getContent().stream().map(TicketMapper::toDomain).toList();
+    }
 }
